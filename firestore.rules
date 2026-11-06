@@ -1,0 +1,105 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Strict server-controlled Custom Claim check
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 1. Users collection: Private user profiles
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'displayName', 'createdAt'])
+        && !request.resource.data.keys().hasAny(['admin', 'role']);
+      allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role']))
+        || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 2. Admins collection: Managed exclusively by verified admins
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 3. Services collection: Publicly readable catalogue, admin writable
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 4. Fruit Mutations (e.g. Hellfire Gas under Gas Fruit)
+    match /fruit_mutations/{mutationId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 5. Orders collection:
+    // Read: Admins, or authenticated customer matching order customerUid
+    // Create: Customers creating initial pending orders only; price/status cannot be manipulated
+    // Update/Delete: Admins ONLY
+    match /orders/{orderId} {
+      allow get: if isAdmin() || (isSignedIn() && resource.data.customerUid == request.auth.uid);
+      allow list: if isAdmin();
+      allow create: if isSignedIn()
+        && request.resource.data.customerUid == request.auth.uid
+        && request.resource.data.status == 'pending_review'
+        && !request.resource.data.keys().hasAny(['staffNotes', 'depositConfirmedAt', 'depositConfirmedBy', 'isPaid']);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 6. Research results & sources (Public read of verified values, admin write)
+    match /research_results/{resultId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /research_sources/{sourceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 7. Value history (Audit trail)
+    match /value_history/{historyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 8. Enquiries
+    match /enquiries/{enquiryId} {
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if true; // Public support inquiry submission
+      allow update, delete: if isAdmin();
+    }
+
+    // 9. Service Evidence (Proofs)
+    match /service_evidence/{evidenceId} {
+      allow read: if resource.data.staffApprovedPublic == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 10. Admin Settings
+    match /admin_settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

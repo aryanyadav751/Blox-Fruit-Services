@@ -1,0 +1,265 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Authenticated user profile for customer identification and order history.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "robloxUsername": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized site administrator record. Bootstrapped with brajbala1989@gmail.com.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 256 },
+        "role": { "type": "string", "enum": ["super_admin", "staff"] },
+        "grantedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Tradable carry services and official fruit / permanent / gamepass catalog items.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "category": { "type": "string", "maxLength": 64 },
+        "slug": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "priceHundredths": { "type": "integer" },
+        "priceM": { "type": "string", "maxLength": 32 },
+        "prerequisites": { "type": "string", "maxLength": 500 },
+        "exclusions": { "type": "string", "maxLength": 500 },
+        "isPublished": { "type": "boolean" },
+        "needsConfirmation": { "type": "boolean" },
+        "parentFruitId": { "type": "string", "maxLength": 128 },
+        "isMutation": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "category", "slug", "name", "priceHundredths", "priceM", "isPublished"]
+    },
+    "FruitMutation": {
+      "title": "FruitMutation",
+      "description": "Fruit mutations strictly linked to a parent fruit (e.g. Hellfire Gas under Gas Fruit).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "parentFruitId": { "type": "string", "maxLength": 128 },
+        "parentFruitName": { "type": "string", "maxLength": 128 },
+        "physicalValueM": { "type": "string", "maxLength": 32 },
+        "permanentValueM": { "type": "string", "maxLength": 32 },
+        "status": { "type": "string", "maxLength": 64 },
+        "sourcesCount": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "parentFruitId", "parentFruitName"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer order with 50/50 escrow pricing, associated with an authenticated customer UID.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "customerUid": { "type": "string", "maxLength": 128 },
+        "customerEmail": { "type": "string", "maxLength": 256 },
+        "publicToken": { "type": "string", "maxLength": 128 },
+        "orderCode": { "type": "string", "maxLength": 32 },
+        "serviceId": { "type": "string", "maxLength": 128 },
+        "serviceName": { "type": "string", "maxLength": 128 },
+        "serviceCategory": { "type": "string", "maxLength": 64 },
+        "robloxUsername": { "type": "string", "maxLength": 64 },
+        "timezone": { "type": "string", "maxLength": 64 },
+        "availability": { "type": "string", "maxLength": 256 },
+        "paymentType": { "type": "string", "enum": ["fruits", "gamepass", "combination"] },
+        "status": { "type": "string", "maxLength": 64 },
+        "totalPriceHundredths": { "type": "integer" },
+        "depositHundredths": { "type": "integer" },
+        "remainingHundredths": { "type": "integer" },
+        "totalPriceM": { "type": "string", "maxLength": 32 },
+        "depositM": { "type": "string", "maxLength": 32 },
+        "remainingM": { "type": "string", "maxLength": 32 },
+        "customerNote": { "type": "string", "maxLength": 1000 },
+        "staffNotes": { "type": "string", "maxLength": 1000 },
+        "consentPublicProofs": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "customerUid", "orderCode", "serviceId", "status", "totalPriceHundredths"]
+    },
+    "ResearchResult": {
+      "title": "ResearchResult",
+      "description": "Online value research record from Google Search Grounding.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "itemId": { "type": "string", "maxLength": 128 },
+        "itemName": { "type": "string", "maxLength": 128 },
+        "category": { "type": "string", "maxLength": 64 },
+        "parentFruitId": { "type": "string", "maxLength": 128 },
+        "parentFruitName": { "type": "string", "maxLength": 128 },
+        "isMutation": { "type": "boolean" },
+        "currentValueM": { "type": "string", "maxLength": 32 },
+        "previousValueM": { "type": "string", "maxLength": 32 },
+        "researchedValueM": { "type": "string", "maxLength": 32 },
+        "changePercent": { "type": "number" },
+        "status": { "type": "string", "maxLength": 64 },
+        "confidence": { "type": "string", "maxLength": 32 },
+        "sourcesCount": { "type": "integer" },
+        "discrepancyNote": { "type": "string", "maxLength": 1000 },
+        "researchedAt": { "type": "string", "format": "date-time" },
+        "approvedAt": { "type": "string", "format": "date-time" },
+        "approvedBy": { "type": "string", "maxLength": 128 },
+        "notes": { "type": "string", "maxLength": 1000 }
+      },
+      "required": ["id", "itemName", "category", "currentValueM", "researchedValueM", "status"]
+    },
+    "ResearchSource": {
+      "title": "ResearchSource",
+      "description": "Specific URL citation and extracted market value from Google Search Grounding.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "researchId": { "type": "string", "maxLength": 128 },
+        "sourceName": { "type": "string", "maxLength": 128 },
+        "sourceUrl": { "type": "string", "maxLength": 512 },
+        "reportedValueM": { "type": "string", "maxLength": 32 },
+        "snippets": { "type": "string", "maxLength": 1000 },
+        "retrievedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "researchId", "sourceName", "sourceUrl", "reportedValueM"]
+    },
+    "ValueHistory": {
+      "title": "ValueHistory",
+      "description": "Permanent audit log of catalogue price changes.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "itemId": { "type": "string", "maxLength": 128 },
+        "itemName": { "type": "string", "maxLength": 128 },
+        "oldValueM": { "type": "string", "maxLength": 32 },
+        "newValueM": { "type": "string", "maxLength": 32 },
+        "changeReason": { "type": "string", "maxLength": 128 },
+        "sourceResearchId": { "type": "string", "maxLength": 128 },
+        "updatedBy": { "type": "string", "maxLength": 128 },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "itemId", "itemName", "oldValueM", "newValueM", "changeReason"]
+    },
+    "Enquiry": {
+      "title": "Enquiry",
+      "description": "Customer support enquiry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "source": { "type": "string", "enum": ["website", "discord", "direct"] },
+        "customerName": { "type": "string", "maxLength": 128 },
+        "robloxUsername": { "type": "string", "maxLength": 64 },
+        "discordTag": { "type": "string", "maxLength": 64 },
+        "orderCodeOrId": { "type": "string", "maxLength": 64 },
+        "subject": { "type": "string", "maxLength": 256 },
+        "message": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["pending", "in_progress", "resolved"] },
+        "staffNotes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "robloxUsername", "subject", "message", "status"]
+    },
+    "ServiceEvidence": {
+      "title": "ServiceEvidence",
+      "description": "Discord screenshot or video completion proof.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "orderId": { "type": "string", "maxLength": 128 },
+        "orderCode": { "type": "string", "maxLength": 32 },
+        "serviceId": { "type": "string", "maxLength": 128 },
+        "serviceName": { "type": "string", "maxLength": 128 },
+        "serviceCategory": { "type": "string", "maxLength": 64 },
+        "robloxUsername": { "type": "string", "maxLength": 64 },
+        "robloxUsernameMasked": { "type": "string", "maxLength": 64 },
+        "evidenceType": { "type": "string", "enum": ["screenshot", "video_link", "screen_share_session"] },
+        "mediaUrl": { "type": "string", "maxLength": 512 },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "customerConsentPublic": { "type": "boolean" },
+        "staffApprovedPublic": { "type": "boolean" },
+        "isOngoing": { "type": "boolean" },
+        "isCompleted": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "reviewedAt": { "type": "string", "format": "date-time" },
+        "reviewedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "orderId", "serviceId", "evidenceType", "mediaUrl"]
+    },
+    "AdminSettings": {
+      "title": "AdminSettings",
+      "description": "Global research scheduler and reliability settings.",
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "autoUpdateEnabled": { "type": "boolean" },
+        "minSources": { "type": "integer" },
+        "maxAllowedPercentChange": { "type": "number" },
+        "intervalHours": { "type": "integer" },
+        "targetCategories": { "type": "array" }
+      },
+      "required": ["enabled", "autoUpdateEnabled", "minSources", "maxAllowedPercentChange"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Authenticated user profile."
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Authorized site administrators."
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Service catalogue, including physical fruits, permanent fruits, and gamepasses."
+    },
+    "/fruit_mutations/{mutationId}": {
+      "schema": "FruitMutation",
+      "description": "Mutations linked to parent fruits (e.g. Hellfire Gas)."
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer orders with 50/50 escrow pricing."
+    },
+    "/research_results/{resultId}": {
+      "schema": "ResearchResult",
+      "description": "Live online research results."
+    },
+    "/research_sources/{sourceId}": {
+      "schema": "ResearchSource",
+      "description": "Grounding source citations."
+    },
+    "/value_history/{historyId}": {
+      "schema": "ValueHistory",
+      "description": "Permanent audit log of price changes."
+    },
+    "/enquiries/{enquiryId}": {
+      "schema": "Enquiry",
+      "description": "Customer support enquiries."
+    },
+    "/service_evidence/{evidenceId}": {
+      "schema": "ServiceEvidence",
+      "description": "Carries proof evidence."
+    },
+    "/admin_settings/{settingId}": {
+      "schema": "AdminSettings",
+      "description": "Scheduler & reliability settings."
+    }
+  }
+}
